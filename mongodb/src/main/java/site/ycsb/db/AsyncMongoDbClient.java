@@ -186,6 +186,10 @@ public class AsyncMongoDbClient extends DB {
       // Set is inserts are done as upserts. Defaults to false.
       useUpsert = Boolean.parseBoolean(
           props.getProperty("mongodb.upsert", "false"));
+
+      if(useUpsert){
+        System.err.println("using upsert");
+      }
       
       // Just use the standard connection format URL
       // http://docs.mongodb.org/manual/reference/connection-string/
@@ -460,8 +464,12 @@ public class AsyncMongoDbClient extends DB {
       for (final Map.Entry<String, ByteIterator> entry : values.entrySet()) {
         fieldsToSet.add(entry.getKey(), entry.getValue().toArray());
       }
+      // upset
       final long res =
-          collection.update(query, update, false, false, writeConcern);
+          collection.update(query, update, false, true, writeConcern);
+      // 标准update
+      // final long res =
+      //     collection.update(query, update, false, false, writeConcern);
       return writeConcern == Durability.NONE || res == 1 ? Status.OK : Status.NOT_FOUND;
     } catch (final Exception e) {
       System.err.println(e.toString());
