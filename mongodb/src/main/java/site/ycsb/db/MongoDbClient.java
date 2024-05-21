@@ -180,7 +180,12 @@ public class MongoDbClient extends DB {
 
       // Set is inserts are done as upserts. Defaults to false.
       useUpsert = Boolean.parseBoolean(
-          props.getProperty("mongodb.upsert", "false"));
+          props.getProperty("mongodb.upsert", "false")); 
+      if(useUpsert){
+        System.err.println("using upsert as insert");
+      }else{
+        System.err.println("not use upsert");
+      }
 
       // Just use the standard connection format URL
       // http://docs.mongodb.org/manual/reference/connection-string/
