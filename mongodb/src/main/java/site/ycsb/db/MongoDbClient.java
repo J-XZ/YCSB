@@ -435,17 +435,37 @@ public class MongoDbClient extends DB {
   @Override
   public Status update(String table, String key,
       Map<String, ByteIterator> values) {
+    
+    int upsert = 1; // 调整这个值决定使用正常update还是upsert
+
     try {
       MongoCollection<Document> collection = database.getCollection(table);
 
       Document query = new Document("_id", key);
       Document fieldsToSet = new Document();
-      for (Map.Entry<String, ByteIterator> entry : values.entrySet()) {
-        fieldsToSet.put(entry.getKey(), entry.getValue().toArray());
+      
+      if(upsert == 0){
+        for (Map.Entry<String, ByteIterator> entry : values.entrySet()) {
+          fieldsToSet.put(entry.getKey(), entry.getValue().toArray());
+        }
       }
+
       Document update = new Document("$set", fieldsToSet);
 
+      if(upsert == 1){
+      // 直接upsert
+        Document toInsert = new Document("_id", key);
+        for (Map.Entry<String, ByteIterator> entry : values.entrySet()) {
+          toInsert.put(entry.getKey(), entry.getValue().toArray());
+        }
+        collection.replaceOne(new Document("_id", query.get("_id")),
+                toInsert, UPDATE_WITH_UPSERT);
+        return Status.OK;
+      }
+
+      // 正常update
       UpdateResult result = collection.updateOne(query, update);
+
       if (result.wasAcknowledged() && result.getMatchedCount() == 0) {
         System.err.println("Nothing updated for key " + key);
         return Status.NOT_FOUND;

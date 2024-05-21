@@ -465,11 +465,11 @@ public class AsyncMongoDbClient extends DB {
         fieldsToSet.add(entry.getKey(), entry.getValue().toArray());
       }
       // upset
-      final long res =
-          collection.update(query, update, false, true, writeConcern);
-      // 标准update
       // final long res =
-      //     collection.update(query, update, false, false, writeConcern);
+          // collection.update(query, update, false, true, writeConcern);
+      // 标准update
+      final long res =
+          collection.update(query, update, false, false, writeConcern);
       return writeConcern == Durability.NONE || res == 1 ? Status.OK : Status.NOT_FOUND;
     } catch (final Exception e) {
       System.err.println(e.toString());
