@@ -55,8 +55,9 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import java.lang.management.ManagementFactory;
-import com.sun.management.UnixOperatingSystemMXBean;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
 
 /**
  * MongoDB binding for YCSB framework using the MongoDB Inc. <a
@@ -169,15 +170,26 @@ public class MongoDbClient extends DB {
   @Override
   public void init() throws DBException {
     try {
-      UnixOperatingSystemMXBean os = (UnixOperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-      long maxFileDescriptorCount = os.getMaxFileDescriptorCount();
-      long openFileDescriptorCount = os.getOpenFileDescriptorCount();
+      // 构建运行时环境
+      ProcessBuilder processBuilder = new ProcessBuilder("bash", "-c", "ulimit -n");
+      // 启动进程
+      Process process = processBuilder.start();
       
-      System.out.println("Maximum number of file descriptors: " + maxFileDescriptorCount);
-      System.out.println("Current number of open file descriptors: " + openFileDescriptorCount);
-    } catch (ClassCastException e) {
-      System.err.println("OperatingSystemMXBean implementation does not support file descriptor counts.");
-    } catch (Exception e) {
+      // 获取进程的输入流
+      BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+      String line;
+      
+      // 读取输出并打印到终端
+      while ((line = reader.readLine()) != null) {
+        System.out.println("Current file descriptor limit: " + line);
+      }
+
+      // 等待进程完成
+      int exitCode = process.waitFor();
+      if (exitCode != 0) {
+        System.err.println("Error: Failed to retrieve ulimit -n. Exit code: " + exitCode);
+      }
+    } catch (IOException | InterruptedException e) {
       e.printStackTrace();
     }
     
