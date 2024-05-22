@@ -607,7 +607,7 @@ public class CoreWorkload extends Workload {
   private HashMap<String, ByteIterator> buildValues(String key) {
     HashMap<String, ByteIterator> values = new HashMap<>();
 
-    System.err.println("build_values1");
+    // System.err.println("build_values1");
 
     for (String fieldkey : fieldnames) {
       ByteIterator data;
@@ -616,7 +616,7 @@ public class CoreWorkload extends Workload {
       } else {
         // fill with random data
         long valueSize = fieldlengthgenerator.nextValue().longValue();
-        System.err.println("build_values_size=" + valueSize);
+        // System.err.println("build_values_size=" + valueSize);
         data = new RandomByteIterator(valueSize);
       }
       values.put(fieldkey, data);
@@ -869,13 +869,13 @@ public class CoreWorkload extends Workload {
 
     if (writeallfields) {
       // new data for all the fields
-      System.err.println("build_values111");
+      // System.err.println("build_values111");
       values = buildValues(keyname);
     } else {
       // update a random field
       values = buildSingleValue(keyname);
     }
-    System.err.println("update_value111");
+    // System.err.println("update_value111");
     db.update(table, keyname, values);
   }
 

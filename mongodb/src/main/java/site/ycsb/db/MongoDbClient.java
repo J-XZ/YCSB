@@ -442,13 +442,13 @@ public class MongoDbClient extends DB {
         // 直接upsert
         Document toInsert = new Document("_id", key);
         for (Map.Entry<String, ByteIterator> entry : values.entrySet()) {
-          long fieldSize = entry.getValue().toString().length();
+          // long fieldSize = entry.getValue().toString().length();
           toInsert.put(entry.getKey(), entry.getValue().toArray());
-          if (fieldSize > 0) {
-            System.err.println("field_size:" + fieldSize);
-          }
+          // if (fieldSize > 0) {
+            // System.err.println("field_size:" + fieldSize);
+          // }
         }
-        System.err.println("update_once");
+        // System.err.println("update_once");
         collection.replaceOne(query, toInsert, UPDATE_WITH_UPSERT);
         return Status.OK;
       }
