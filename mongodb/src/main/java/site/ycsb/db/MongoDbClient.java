@@ -457,9 +457,9 @@ public class MongoDbClient extends DB {
         Document toInsert = new Document("_id", key);
         for (Map.Entry<String, ByteIterator> entry : values.entrySet()) {
           toInsert.put(entry.getKey(), entry.getValue().toArray());
+          System.err.println("field_size:" + entry.getValue().toString().length());
         }
-        collection.replaceOne(new Document("_id", query.get("_id")),
-                toInsert, UPDATE_WITH_UPSERT);
+        collection.replaceOne(query, toInsert, UPDATE_WITH_UPSERT);
         return Status.OK;
       }
 
