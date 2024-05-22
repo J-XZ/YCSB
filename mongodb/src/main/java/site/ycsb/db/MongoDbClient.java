@@ -55,6 +55,9 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import java.lang.management.ManagementFactory;
+import com.sun.management.UnixOperatingSystemMXBean;
+
 /**
  * MongoDB binding for YCSB framework using the MongoDB Inc. <a
  * href="http://docs.mongodb.org/ecosystem/drivers/java/">driver</a>
@@ -165,6 +168,19 @@ public class MongoDbClient extends DB {
    */
   @Override
   public void init() throws DBException {
+    try {
+      UnixOperatingSystemMXBean os = (UnixOperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+      long maxFileDescriptorCount = os.getMaxFileDescriptorCount();
+      long openFileDescriptorCount = os.getOpenFileDescriptorCount();
+      
+      System.out.println("Maximum number of file descriptors: " + maxFileDescriptorCount);
+      System.out.println("Current number of open file descriptors: " + openFileDescriptorCount);
+    } catch (ClassCastException e) {
+      System.err.println("OperatingSystemMXBean implementation does not support file descriptor counts.");
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    
     INIT_COUNT.incrementAndGet();
     synchronized (INCLUDE) {
       if (mongoClient != null) {
