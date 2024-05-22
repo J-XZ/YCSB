@@ -448,7 +448,7 @@ public class MongoDbClient extends DB {
             System.err.println("field_size:" + fieldSize);
           }
         }
-        System.err.println("opdate_once");
+        System.err.println("update_once");
         collection.replaceOne(query, toInsert, UPDATE_WITH_UPSERT);
         return Status.OK;
       }
