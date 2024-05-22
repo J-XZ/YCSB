@@ -869,12 +869,13 @@ public class CoreWorkload extends Workload {
 
     if (writeallfields) {
       // new data for all the fields
+      System.err.println("build_values111");
       values = buildValues(keyname);
     } else {
       // update a random field
       values = buildSingleValue(keyname);
     }
-
+    System.err.println("update_value111");
     db.update(table, keyname, values);
   }
 
