@@ -72,8 +72,7 @@ public class MongoDbClient extends DB {
   private static final Integer INCLUDE = Integer.valueOf(1);
 
   /** The options to use for inserting many documents. */
-  private static final InsertManyOptions INSERT_UNORDERED =
-      new InsertManyOptions().ordered(false);
+  private static final InsertManyOptions INSERT_UNORDERED = new InsertManyOptions().ordered(false);
 
   /** The options to use for inserting a single document. */
   private static final UpdateOptions UPDATE_WITH_UPSERT = new UpdateOptions()
@@ -136,9 +135,9 @@ public class MongoDbClient extends DB {
    * Delete a record from the database.
    * 
    * @param table
-   *          The name of the table
+   *              The name of the table
    * @param key
-   *          The record key of the record to delete.
+   *              The record key of the record to delete.
    * @return Zero on success, a non-zero error code on error. See the {@link DB}
    *         class's description for a discussion of error codes.
    */
@@ -148,8 +147,7 @@ public class MongoDbClient extends DB {
       MongoCollection<Document> collection = database.getCollection(table);
 
       Document query = new Document("_id", key);
-      DeleteResult result =
-          collection.withWriteConcern(writeConcern).deleteOne(query);
+      DeleteResult result = collection.withWriteConcern(writeConcern).deleteOne(query);
       if (result.wasAcknowledged() && result.getDeletedCount() == 0) {
         System.err.println("Nothing deleted for key " + key);
         return Status.NOT_FOUND;
@@ -180,10 +178,10 @@ public class MongoDbClient extends DB {
 
       // Set is inserts are done as upserts. Defaults to false.
       useUpsert = Boolean.parseBoolean(
-          props.getProperty("mongodb.upsert", "false")); 
-      if(useUpsert){
+          props.getProperty("mongodb.upsert", "false"));
+      if (useUpsert) {
         System.err.println("using upsert as insert");
-      }else{
+      } else {
         System.err.println("not use upsert");
       }
 
@@ -225,10 +223,9 @@ public class MongoDbClient extends DB {
         writeConcern = uri.getOptions().getWriteConcern();
 
         mongoClient = new MongoClient(uri);
-        database =
-            mongoClient.getDatabase(databaseName)
-                .withReadPreference(readPreference)
-                .withWriteConcern(writeConcern);
+        database = mongoClient.getDatabase(databaseName)
+            .withReadPreference(readPreference)
+            .withWriteConcern(writeConcern);
 
         System.out.println("mongo client connection created with " + url);
       } catch (Exception e1) {
@@ -247,11 +244,11 @@ public class MongoDbClient extends DB {
    * key.
    * 
    * @param table
-   *          The name of the table
+   *               The name of the table
    * @param key
-   *          The record key of the record to insert.
+   *               The record key of the record to insert.
    * @param values
-   *          A HashMap of field/value pairs to insert in the record
+   *               A HashMap of field/value pairs to insert in the record
    * @return Zero on success, a non-zero error code on error. See the {@link DB}
    *         class's description for a discussion of error codes.
    */
@@ -279,8 +276,7 @@ public class MongoDbClient extends DB {
         bulkInserts.add(toInsert);
         if (bulkInserts.size() == batchSize) {
           if (useUpsert) {
-            List<UpdateOneModel<Document>> updates = 
-                new ArrayList<UpdateOneModel<Document>>(bulkInserts.size());
+            List<UpdateOneModel<Document>> updates = new ArrayList<UpdateOneModel<Document>>(bulkInserts.size());
             for (Document doc : bulkInserts) {
               updates.add(new UpdateOneModel<Document>(
                   new Document("_id", doc.get("_id")),
@@ -310,13 +306,13 @@ public class MongoDbClient extends DB {
    * be stored in a HashMap.
    * 
    * @param table
-   *          The name of the table
+   *               The name of the table
    * @param key
-   *          The record key of the record to read.
+   *               The record key of the record to read.
    * @param fields
-   *          The list of fields to read, or null for all of them
+   *               The list of fields to read, or null for all of them
    * @param result
-   *          A HashMap of field/value pairs for the result
+   *               A HashMap of field/value pairs for the result
    * @return Zero on success, a non-zero error code on error or "not found".
    */
   @Override
@@ -353,16 +349,17 @@ public class MongoDbClient extends DB {
    * pair from the result will be stored in a HashMap.
    * 
    * @param table
-   *          The name of the table
+   *                    The name of the table
    * @param startkey
-   *          The record key of the first record to read.
+   *                    The record key of the first record to read.
    * @param recordcount
-   *          The number of records to read
+   *                    The number of records to read
    * @param fields
-   *          The list of fields to read, or null for all of them
+   *                    The list of fields to read, or null for all of them
    * @param result
-   *          A Vector of HashMaps, where each HashMap is a set field/value
-   *          pairs for one record
+   *                    A Vector of HashMaps, where each HashMap is a set
+   *                    field/value
+   *                    pairs for one record
    * @return Zero on success, a non-zero error code on error. See the {@link DB}
    *         class's description for a discussion of error codes.
    */
@@ -377,8 +374,7 @@ public class MongoDbClient extends DB {
       Document query = new Document("_id", scanRange);
       Document sort = new Document("_id", INCLUDE);
 
-      FindIterable<Document> findIterable =
-          collection.find(query).sort(sort).limit(recordcount);
+      FindIterable<Document> findIterable = collection.find(query).sort(sort).limit(recordcount);
 
       if (fields != null) {
         Document projection = new Document();
@@ -398,8 +394,7 @@ public class MongoDbClient extends DB {
       result.ensureCapacity(recordcount);
 
       while (cursor.hasNext()) {
-        HashMap<String, ByteIterator> resultMap =
-            new HashMap<String, ByteIterator>();
+        HashMap<String, ByteIterator> resultMap = new HashMap<String, ByteIterator>();
 
         Document obj = cursor.next();
         fillMap(resultMap, obj);
@@ -424,45 +419,45 @@ public class MongoDbClient extends DB {
    * key, overwriting any existing values with the same field name.
    * 
    * @param table
-   *          The name of the table
+   *               The name of the table
    * @param key
-   *          The record key of the record to write.
+   *               The record key of the record to write.
    * @param values
-   *          A HashMap of field/value pairs to update in the record
+   *               A HashMap of field/value pairs to update in the record
    * @return Zero on success, a non-zero error code on error. See this class's
    *         description for a discussion of error codes.
    */
   @Override
   public Status update(String table, String key,
       Map<String, ByteIterator> values) {
-    
+
     int upsert = 1; // 调整这个值决定使用正常update还是upsert
 
     try {
       MongoCollection<Document> collection = database.getCollection(table);
 
       Document query = new Document("_id", key);
-      Document fieldsToSet = new Document();
-      
-      if(upsert == 0){
-        for (Map.Entry<String, ByteIterator> entry : values.entrySet()) {
-          fieldsToSet.put(entry.getKey(), entry.getValue().toArray());
-        }
-      }
 
-      Document update = new Document("$set", fieldsToSet);
-
-      if(upsert == 1){
-      // 直接upsert
+      if (upsert == 1) {
+        // 直接upsert
         Document toInsert = new Document("_id", key);
         for (Map.Entry<String, ByteIterator> entry : values.entrySet()) {
           toInsert.put(entry.getKey(), entry.getValue().toArray());
-          System.err.println("field_size:" + entry.getValue().toString().length());
+          long fieldSize = entry.getValue().toString().length();
+          if (fieldSize > 0) {
+            System.err.println("field_size:" + fieldSize);
+          }
         }
+        System.err.println("opdate_once");
         collection.replaceOne(query, toInsert, UPDATE_WITH_UPSERT);
         return Status.OK;
       }
 
+      Document fieldsToSet = new Document();
+      for (Map.Entry<String, ByteIterator> entry : values.entrySet()) {
+        fieldsToSet.put(entry.getKey(), entry.getValue().toArray());
+      }
+      Document update = new Document("$set", fieldsToSet);
       // 正常update
       UpdateResult result = collection.updateOne(query, update);
 
@@ -481,9 +476,9 @@ public class MongoDbClient extends DB {
    * Fills the map with the values from the DBObject.
    * 
    * @param resultMap
-   *          The map to fill/
+   *                  The map to fill/
    * @param obj
-   *          The object to copy values from.
+   *                  The object to copy values from.
    */
   protected void fillMap(Map<String, ByteIterator> resultMap, Document obj) {
     for (Map.Entry<String, Object> entry : obj.entrySet()) {
