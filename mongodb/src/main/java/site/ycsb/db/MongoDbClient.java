@@ -442,8 +442,8 @@ public class MongoDbClient extends DB {
         // 直接upsert
         Document toInsert = new Document("_id", key);
         for (Map.Entry<String, ByteIterator> entry : values.entrySet()) {
-          toInsert.put(entry.getKey(), entry.getValue().toArray());
           long fieldSize = entry.getValue().toString().length();
+          toInsert.put(entry.getKey(), entry.getValue().toArray());
           if (fieldSize > 0) {
             System.err.println("field_size:" + fieldSize);
           }
